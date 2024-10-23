@@ -1,0 +1,19 @@
+---
+- hosts: my_application
+  tasks:
+    - name: Prepare my_app
+      copy:
+        src: my_app/    # note the '/' <-- !!!
+        dest: /my_app/
+
+    - name: Installing python requirements for my_app
+      pip:
+        requirements: requirements.txt
+        chdir: /my_app
+
+    - name: Killing previously started pythons (if any)
+      shell: "ps aux | grep -i my_app.py | awk {'print $2'} | xargs kill -9"
+      ignore_errors: yes
+
+    - name: Start the my_app
+      shell: "cd /my_app; nohup python3 main.py </dev/null >/var/log/my_app 2>&1 &"
